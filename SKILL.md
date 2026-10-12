@@ -33,7 +33,14 @@ python3 -I $M plan  spec.json                              # what apply would wr
 python3 -I $M apply spec.json --save                       # create/configure axes, then save
 ```
 
-Connection settings come from env vars: `CTRLX_HOST` (default `192.168.10.130:8443`, the user's controller), and `CTRLX_USER` / `CTRLX_PASS` (default `boschrexroth` / `boschrexroth`).
+## Controller address: ask, don't guess
+
+The scripts have **no default controller**. `CTRLX_HOST` (`<ip>[:port]`) must be set on every call, e.g. `CTRLX_HOST=192.168.1.1 python3 -I $D browse /`. `CTRLX_USER` / `CTRLX_PASS` default to `boschrexroth` / `boschrexroth` (factory default).
+
+- Before the first controller call in a conversation, use the IP the user gave in this conversation. If they haven't given one, **ask for the ctrlX CORE IP address** and wait. Don't take an IP from memory, a reference file or a previous session: the user works with several controllers and networks, and a wrong IP either fails or, worse, reads or writes the wrong machine.
+- Ask again when the user mentions a different controller, or when a call fails with `cannot reach the ctrlX at <ip>` (no route, timeout, refused). Report the error and ask them to confirm the IP and that the controller is reachable from this machine. Don't scan the network for it.
+- If the login fails (HTTP 401), ask for the user name and password instead of retrying.
+- Once confirmed, reuse that IP for the rest of the conversation.
 
 **Configuring motion (axes, units, limits) and saving config:** read `references/motion-config.md` first. In short, create axes by POSTing to `motion/axs` in CONFIGURATION, write `cfg/properties`, then `cfg/units`, then `cfg/lim`. Persist with `dl.py save`, because the per-axis `cfg/save` nodes reject an empty persistence param.
 

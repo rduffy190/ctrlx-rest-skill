@@ -8,7 +8,8 @@ HERE="$(cd "$(dirname "$0")" && pwd)"
 echo "== offline (mock controller)"
 python3 "$HERE/test_offline.py"
 if [ "${1:-}" = "--live" ]; then
-    echo "== live, read-only (${CTRLX_HOST:-192.168.10.130:8443})"
+    [ -n "${CTRLX_HOST:-}" ] || { echo "--live needs CTRLX_HOST=<controller ip>[:port]"; exit 2; }
+    echo "== live, read-only ($CTRLX_HOST)"
     python3 "$HERE/test_live.py"
 fi
 echo "ALL OK"

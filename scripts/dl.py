@@ -19,7 +19,7 @@ Usage:
   dl.py token                           print a bearer token (for curl)
 
 Connection (env vars):
-  CTRLX_HOST  host[:port]  default 192.168.10.130:8443
+  CTRLX_HOST  host[:port]  REQUIRED, no default (e.g. 192.168.1.1 or 192.168.1.1:8443)
   CTRLX_USER / CTRLX_PASS  default boschrexroth / boschrexroth (factory default)
 
 Self-signed certificates are accepted (ctrlX ships with one).
@@ -33,7 +33,7 @@ import urllib.error
 import urllib.parse
 import urllib.request
 
-HOST = os.environ.get("CTRLX_HOST", "192.168.10.130:8443")
+HOST = os.environ.get("CTRLX_HOST", "").strip()
 USER = os.environ.get("CTRLX_USER", "boschrexroth")
 PASS = os.environ.get("CTRLX_PASS", "boschrexroth")
 BASE = f"https://{HOST}"
@@ -47,12 +47,22 @@ _token = None
 
 def token():
     global _token
+    if not HOST:
+        sys.exit("CTRLX_HOST is not set: ask the user for the ctrlX CORE IP address, "
+                 "then run with CTRLX_HOST=<ip>[:port]")
     if _token is None:
         body = json.dumps({"name": USER, "password": PASS}).encode()
         req = urllib.request.Request(f"{BASE}/identity-manager/api/v1.0/auth/token", body,
                                      {"Content-Type": "application/json"}, method="POST")
-        with urllib.request.urlopen(req, context=CTX, timeout=10) as r:
-            _token = json.load(r)["access_token"]
+        try:
+            with urllib.request.urlopen(req, context=CTX, timeout=10) as r:
+                _token = json.load(r)["access_token"]
+        except urllib.error.HTTPError as e:
+            sys.exit(f"login to {HOST} failed (HTTP {e.code}): check CTRLX_USER / CTRLX_PASS")
+        except (urllib.error.URLError, OSError) as e:
+            reason = getattr(e, "reason", e)
+            sys.exit(f"cannot reach the ctrlX at {HOST} ({reason}): "
+                     "ask the user to confirm the controller IP address and that it is reachable")
     return _token
 
 

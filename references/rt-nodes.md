@@ -1,6 +1,8 @@
-# RT node layouts seen on the controller (192.168.10.130)
+# RT node layouts seen on a controller
 
-Read 2026-10-09 with `dl.py rtmap`. Re-read before relying on them, because they change when axes or the cyclic-status configuration change.
+Read 2026-10-09 with `dl.py rtmap` on the controller at 192.168.10.130 (an example, not the default: ask the user which controller to use).
+
+**The per-axis block layout of `cyclicStatusData` is the same on every controller** (the user confirmed this). You can write the code against the field table below without reading the map over REST first. What differs per machine is the **axis names**, and with them which blocks exist and where each block starts. **The PLC code must still read the live map at runtime** (`FB_AxisRtMap`): it finds and confirms every offset by `<axis>/<field>` name, and gets the map revision that `BeginAccess` needs. Never hard-code offsets or the revision from this table. Get those from the user or the project's axis config (e.g. `motion/*.json`), or browse `motion/axs` when a controller IP is known. Never reuse the example names below (Ax1, Ax2, VM).
 
 ## motion/realtime/cyclicStatusData
 

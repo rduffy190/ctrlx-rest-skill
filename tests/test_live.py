@@ -1,4 +1,4 @@
-"""Live, READ-ONLY smoke test against a real controller (CTRLX_HOST, default 192.168.10.130:8443).
+"""Live, READ-ONLY smoke test against a real controller (CTRLX_HOST, required).
 
 Nothing is written: only GETs, a bulk read, and 'motion_axes.py show/plan' (plan never writes).
 Run with: tests/run.sh --live
