@@ -7,6 +7,7 @@ These notes were verified against this project's controller (ctrlX COREvirtual, 
 ## Before writing
 
 - `motion/state/opstate` must read `Configuration` to create or delete axes. It follows the ctrlX OS state: SETUP gives Configuration, OPERATION gives Running. Limits can usually still be changed while Running, but objects can't be added or removed.
+- **Switching SETUP / OPERATING over the Data Layer:** `PUT scheduler/admin/state` with `{"type":"object","value":{"state":"SETUP"}}` (allowed values `SERVICE;SETUP;OPERATING`, type `types/scheduler/state2`); `dl.py write scheduler/admin/state object '{"state":"SETUP"}'`. Motion follows within a second. `system/state` and `framework/state` are read-only. Verified on a COREvirtual, 2026-10-15. Delete kinematics (`motion/kin/<name>`) before the axes they use.
 - `motion/axs` (browse) lists the existing axes.
 - **Real or virtual?** `axisprofile/profiles` (browse) lists the drive profiles. An empty list, or no EtherCAT master in the Data Layer root, means only **virtual axes** are possible (`axisProfileName: ""`). On a COREvirtual it's always virtual. To make an axis real later, write a profile name to the axis' profile node, which is only allowed in SETUP. The node name depends on the Motion version (see the table below).
 - **Names** are at most 16 chars of `[A-Za-z0-9_]` and must be unique across axes and kinematics. The PLC `AXIS_REF.AxisName` is `STRING(15)`, so keep names ≤ 15 characters.
