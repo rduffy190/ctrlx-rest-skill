@@ -2,7 +2,7 @@
 
 These notes were verified against this project's controller (ctrlX COREvirtual, Motion 4.6, Data Layer API 2.1.5) on 2026-10-09. The manual background is in ctrlx-engineer `references/motion/04-01_General_information.md`, sections 4.1.5–4.1.9.
 
-**Use the scripts.** `scripts/motion_axes.py plan|apply <spec.json> [--save]` does everything below from a JSON spec, and `show` prints a summary table. `references/examples/press_axes.json` is a worked spec.
+**Use the scripts.** `scripts/motion_axes.py plan|apply <spec.json> [--save]` does everything below from a JSON spec, and `show` prints a summary table. `references/examples/example_axes.json` is a worked spec.
 
 ## Before writing
 

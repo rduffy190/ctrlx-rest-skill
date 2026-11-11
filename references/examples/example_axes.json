@@ -1,0 +1,9 @@
+{
+  "units": {"position+length": "mm", "velocity": "mm/s", "acceleration": "mm/s^2", "jerk": "mm/s^3"},
+  "axes": {
+    "Lift":     {"type": "LINEAR", "limits": {"posMin": -5, "posMax": 150,  "vel": 200,  "acc": 2000, "jerk": 0}},
+    "Transfer": {"type": "LINEAR", "limits": {"posMin": -5, "posMax": 1050, "vel": 1000, "acc": 5000, "jerk": 0}},
+    "Z1":       {"type": "LINEAR", "limits": {"posMin": -5, "posMax": 105,  "vel": 300,  "acc": 5000, "jerk": 0}},
+    "Z2":       {"type": "LINEAR", "limits": {"posMin": -5, "posMax": 105,  "vel": 300,  "acc": 5000, "jerk": 0}}
+  }
+}

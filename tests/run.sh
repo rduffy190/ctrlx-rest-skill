@@ -4,6 +4,8 @@
 #   tests/run.sh --live   also a READ-ONLY smoke test against the real controller (CTRLX_HOST)
 # Needs python3 and openssl. Exits non-zero on any failure.
 set -euo pipefail
+# On Windows, python3 is often only the Microsoft Store alias: fall back to python.
+python3 -c "" 2>/dev/null || python3() { python "$@"; }
 HERE="$(cd "$(dirname "$0")" && pwd)"
 echo "== offline (mock controller)"
 python3 "$HERE/test_offline.py"

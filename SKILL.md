@@ -9,10 +9,10 @@ The Data Layer is ctrlX OS's central data bus. Everything (motion, PLC, I/O, app
 
 ## Quick use: the helper script
 
-`scripts/dl.py` uses only the standard library. Run it with `python3 -I`:
+`scripts/dl.py` uses only the standard library. Run it with `python3 -I` (`python -I` on Windows). `<skill-dir>` is this skill's folder:
 
 ```bash
-D=~/.claude/skills/ctrlx-rest/scripts/dl.py
+D=<skill-dir>/scripts/dl.py
 python3 -I $D browse /                                     # root nodes
 python3 -I $D browse motion/axs                            # axis names
 python3 -I $D read   motion/axs/Ax1/state/values/actual/pos
@@ -27,7 +27,7 @@ python3 -I $D create motion/axs string '"Ax1"'             # POST: create a node
 python3 -I $D delete motion/axs/Ax1                        # DELETE
 python3 -I $D save "what changed"                          # save the ACTIVE configuration (persist)
 
-M=~/.claude/skills/ctrlx-rest/scripts/motion_axes.py
+M=<skill-dir>/scripts/motion_axes.py
 python3 -I $M show                                         # axes: type, virtual/profile, limits, units
 python3 -I $M plan  spec.json                              # what apply would write (no writes)
 python3 -I $M apply spec.json --save                       # create/configure axes, then save
@@ -106,7 +106,7 @@ Some nodes are **shared-memory buffers**, not values: `motion/realtime/cyclicSta
 - The `revision` changes when the variable list changes. The PLC's `DL_MemUser.BeginAccess` takes it, so store it with any offsets you hard-code, and check it before trusting them.
 - Map entries come back unsorted. `dl.py rtmap` sorts them, and `dl.py rtdata` decodes the live buffer, which is a quick check of any offset table.
 
-See `references/rt-nodes.md` for the layouts already read from this project's controller. For reading a map on the PLC (`DL_MemUser.GetMemoryMap` and `comm_datalayer_MemoryMap`), see the `ctrlx-engineer` skill, `references/datalayer-rt.md`.
+See `references/rt-nodes.md` for the `cyclicStatusData` field layout as read from a controller. For reading a map on the PLC (`DL_MemUser.GetMemoryMap` and `comm_datalayer_MemoryMap`), see the `ctrlx-engineer` skill, `references/datalayer-rt.md`.
 
 ## Where things live (ctrlX MOTION)
 

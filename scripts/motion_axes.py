@@ -8,7 +8,7 @@ Usage:
                                             (and the axis profile if given); --save then saves
                                             the active configuration so it survives reboot
 
-Spec (see references/examples/press_axes.json):
+Spec (see references/examples/example_axes.json):
   {"units": {"position+length": "mm", "velocity": "mm/s", "acceleration": "mm/s^2", "jerk": "mm/s^3"},
    "axes": {"Ax1": {"type": "LINEAR", "modulo": false, "moduloValue": 0,
                     "axisProfileName": "",            # optional; "" = virtual axis

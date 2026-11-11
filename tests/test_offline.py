@@ -15,7 +15,7 @@ import ssl
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 SCRIPTS = os.path.join(HERE, "..", "scripts")
-SPEC = os.path.join(HERE, "..", "references", "examples", "press_axes.json")
+SPEC = os.path.join(HERE, "..", "references", "examples", "example_axes.json")
 fails = []
 
 
@@ -97,20 +97,20 @@ try:
     r = run("motion_axes.py", "apply", SPEC, "--save")
     check("apply: succeeded", r.returncode == 0, r.stderr)
     axes = json.loads(dl("browse", "motion/axs").stdout)["value"]
-    check("apply: 4 axes created", axes == ["BeamLift", "BeamTransfer", "PressA", "PressB"], axes)
-    cfg = json.loads(dl("read", "motion/axs/BeamTransfer/cfg").stdout)["value"]
+    check("apply: 4 axes created", axes == ["Lift", "Transfer", "Z1", "Z2"], axes)
+    cfg = json.loads(dl("read", "motion/axs/Transfer/cfg").stdout)["value"]
     lim = cfg["limits"]
     check("apply: limits written with their units", lim["posMax"] == 1050 and lim["velPos"] == 1000
           and lim["velPosUnit"] == "mm/s" and lim["accUnit"] == "mm/s^2", lim)
     units = {u["valueType"]: u["abbreviation"] for u in cfg["units"]["default"]}
     check("apply: default units set", units == {"position+length": "mm", "velocity": "mm/s",
                                                 "acceleration": "mm/s^2", "jerk": "mm/s^3"}, units)
-    order = [e["path"].rsplit("/", 1)[-1] for e in log() if e["method"] == "PUT" and "/BeamLift/cfg/" in e["path"]]
+    order = [e["path"].rsplit("/", 1)[-1] for e in log() if e["method"] == "PUT" and "/Lift/cfg/" in e["path"]]
     check("apply: properties written before units and limits", order[:3] == ["properties", "units", "lim"], order)
     check("apply --save: saved through the Solutions task, nothing unsaved",
           json.loads(dl("read", "motion/cfg/unsaved").stdout)["value"] is False
           and any(e["path"] == "/solutions/api/v1/tasks" for e in log()))
-    check("show: table lists the axes as virtual", "BeamLift" in r.stdout and "(virtual)" in r.stdout, r.stdout)
+    check("show: table lists the axes as virtual", "Lift" in r.stdout and "(virtual)" in r.stdout, r.stdout)
 
     # re-plan: everything is an UPDATE now
     r = run("motion_axes.py", "plan", SPEC)
@@ -119,19 +119,19 @@ try:
     # axis profile: written to cfg/axisprofile (not cfg/axisProfileName), and only when it changes
     prof = os.path.join(tmp, "prof.json")
     lim1 = {"posMin": 0, "posMax": 1, "vel": 1, "acc": 1}
-    json.dump({"axes": {"BeamLift": {"axisProfileName": "", "limits": lim1}}}, open(prof, "w"))
+    json.dump({"axes": {"Lift": {"axisProfileName": "", "limits": lim1}}}, open(prof, "w"))
     before = len(log())
     r = run("motion_axes.py", "apply", prof)
     puts = [e["path"] for e in log()[before:] if e["method"] == "PUT"]
     check("profile: unchanged value is not written", r.returncode == 0 and not any("axisprofile" in p.lower()
           for p in puts) and "not written" in r.stdout, (r.stderr, puts))
-    json.dump({"axes": {"BeamLift": {"axisProfileName": "MockDrive", "limits": lim1}}}, open(prof, "w"))
+    json.dump({"axes": {"Lift": {"axisProfileName": "MockDrive", "limits": lim1}}}, open(prof, "w"))
     before = len(log())
     r = run("motion_axes.py", "apply", prof)
     puts = [e["path"] for e in log()[before:] if e["method"] == "PUT"]
     check("profile: changed value written to cfg/axisprofile", r.returncode == 0
-          and "/automation/api/v2/nodes/motion/axs/BeamLift/cfg/axisprofile" in puts
-          and json.loads(dl("read", "motion/axs/BeamLift/cfg").stdout)["value"]["axisProfileName"] == "MockDrive",
+          and "/automation/api/v2/nodes/motion/axs/Lift/cfg/axisprofile" in puts
+          and json.loads(dl("read", "motion/axs/Lift/cfg").stdout)["value"]["axisProfileName"] == "MockDrive",
           (r.stderr, puts))
 
     # name validation
@@ -141,7 +141,7 @@ try:
     check("spec: invalid axis name rejected", r.returncode != 0 and "bad axis name" in r.stderr, r.stderr)
 
     # the per-axis save node really does reject an empty parameter (why dl.py save exists)
-    r = dl("create", "motion/axs/BeamLift/cfg/save", "object", "{}", ok=False)
+    r = dl("create", "motion/axs/Lift/cfg/save", "object", "{}", ok=False)
     check("per-axis cfg/save rejects empty param (500 Invalid parameter)", r.returncode != 0 and "Invalid parameter" in r.stderr)
 
     # dl.py save
